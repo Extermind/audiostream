@@ -44,7 +44,12 @@ class SineSource(ThreadSource):
                 vl = next(glnext)
             buf[i] = lvl = vl
             i += 1
-        return buf.tobytes()
+        # Based on https://github.com/DavidCheuk/audiostream/
+        # AMDENDED return buf.tostring()
+        # tobytes was introduced in ver 3.2, and since then tostring is deprecated alias for tobytes
+        # current implementation isn't ready for situation when it's completely removed, and that what happened in ver 3.9
+        # the following solves the compatability issue
+        return buf.tobytes() if sys.version_info[1] >= 2 else buf.tostring()
 
     def _get_bytes_stereo(self):
         cdef int i = 0
@@ -70,7 +75,12 @@ class SineSource(ThreadSource):
             buf[i] = lvl = vl
             buf[i+1] = lvr = vr
             i += 2
-        return buf.tobytes()
+        # Based on https://github.com/DavidCheuk/audiostream/
+        # AMDENDED return buf.tostring()
+        # tobytes was introduced in ver 3.2, and since then tostring is deprecated alias for tobytes
+        # current implementation isn't ready for situation when it's completely removed, and that what happened in ver 3.9
+        # the following solves the compatability issue
+        return buf.tobytes() if sys.version_info[1] >= 2 else buf.tostring()
 
     def sine(self, float frequency=440.0, float amplitude=0.5):
         cdef int i = 0

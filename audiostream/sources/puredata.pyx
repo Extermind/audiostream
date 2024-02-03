@@ -1,5 +1,5 @@
 from libc.math cimport sin
-
+import sys
 import array
 
 from audiostream.sources.thread import ThreadSource
@@ -29,7 +29,12 @@ class PatchSource(ThreadSource):
                     if x % blocksize == 0:
                         outbuf = m.process(inbuf)
                     buf[x] = outbuf[(x % blocksize)]
-                yield buf.tobytes()
+                # Based on https://github.com/DavidCheuk/audiostream/
+                # AMDENDED return buf.tostring()
+                # tobytes was introduced in ver 3.2, and since then tostring is deprecated alias for tobytes
+                # current implementation isn't ready for situation when it's completely removed, and that what happened in ver 3.9
+                # the following solves the compatability issue
+                yield buf.tobytes() if sys.version_info[1] >= 2 else buf.tostring()
         except StopIteration:
             return
 
